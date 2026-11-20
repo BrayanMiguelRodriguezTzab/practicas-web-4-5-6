@@ -1,0 +1,16 @@
+[
+  {
+    "id": 101,
+    "userId": 1,
+    "texto": "Otra nota",
+    "fecha": "3/7/2026, 4:58:04 PM",
+    "color": "#cccccc"
+  },
+  {
+    "id": 102,
+    "userId": 1,
+    "texto": "Yo soy una nota",
+    "fecha": "3/7/2026, 4:57:50 PM",
+    "color": "#bdbdbd"
+  }
+]

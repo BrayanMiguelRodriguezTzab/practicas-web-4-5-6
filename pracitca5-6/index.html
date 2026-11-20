@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Note Taking App - Vue.js</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="bg-light">
+
+<div id="app" class="container py-4" style="max-width: 750px;">
+  <h1 class="fw-bold">Simple note taking app <small class="text-muted fs-4">by Equipo 8</small></h1>
+
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Usuario activo:</label>
+    <select v-model="usuarioActual" class="form-select w-auto">
+      <option v-for="u in usuarios" :key="u.id" :value="u.id">{{ u.nombre }}</option>
+    </select>
+  </div>
+
+  <h3 class="mt-3">Add new note</h3>
+  <div v-if="errorMsg" class="alert alert-danger py-2">{{ errorMsg }}</div>
+
+  <div class="mb-2">
+    <label class="form-label">Write a note:</label>
+    <textarea v-model="nuevaNota" class="form-control" rows="3" placeholder="Your note goes here..."></textarea>
+  </div>
+
+  <button @click="guardarNota" class="btn btn-success mb-2">{{ editandoId ? 'Update' : 'Save' }}</button>
+
+  <div class="mb-4">
+    <label class="me-2">Choose a color:</label>
+    <input type="color" v-model="colorNota">
+  </div>
+
+  <!-- Lista de notas filtradas por usuario -->
+  <div v-for="nota in notasDelUsuario" :key="nota.id" class="p-3 mb-3 rounded shadow-sm"
+       :style="{ backgroundColor: nota.color }">
+    <h4>{{ nota.texto }}</h4>
+    <p class="mb-2">{{ nota.fecha }}</p>
+    <button @click="editarNota(nota)" class="btn btn-warning btn-sm me-2">Edit</button>
+    <button @click="eliminarNota(nota.id)" class="btn btn-danger btn-sm">Delete</button>
+  </div>
+</div>
+
+<script>
+const { createApp } = Vue;
+createApp({
+  data() {
+    return {
+      usuarioActual: 1,
+      usuarios: [
+        { id: 1, nombre: 'Brayan Rodríguez' },
+        { id: 2, nombre: 'Manuel Keb' }
+      ],
+      notas: [
+        { id: 101, userId: 1, texto: 'Otra nota', fecha: '3/7/2026, 4:58:04 PM', color: '#cccccc' },
+        { id: 102, userId: 1, texto: 'Yo soy una nota', fecha: '3/7/2026, 4:57:50 PM', color: '#bdbdbd' }
+      ],
+      nuevaNota: '',
+      colorNota: '#cccccc',
+      editandoId: null,
+      errorMsg: ''
+    };
+  },
+  computed: {
+    notasDelUsuario() {
+      return this.notas.filter(n => n.userId === this.usuarioActual);
+    }
+  },
+  methods: {
+    guardarNota() {
+      if (!this.nuevaNota.trim()) {
+        this.errorMsg = 'El campo de la nota no puede estar vacío.';
+        return;
+      }
+      this.errorMsg = '';
+      if (this.editandoId) {
+        const idx = this.notas.findIndex(n => n.id === this.editandoId);
+        this.notas[idx].texto = this.nuevaNota;
+        this.notas[idx].color = this.colorNota;
+        this.editandoId = null;
+      } else {
+        this.notas.unshift({
+          id: Date.now(),
+          userId: this.usuarioActual,
+          texto: this.nuevaNota,
+          fecha: new Date().toLocaleString(),
+          color: this.colorNota
+        });
+      }
+      this.nuevaNota = '';
+    },
+    editarNota(nota) {
+      this.nuevaNota = nota.texto;
+      this.colorNota = nota.color;
+      this.editandoId = nota.id;
+    },
+    eliminarNota(id) {
+      this.notas = this.notas.filter(n => n.id !== id);
+    }
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
